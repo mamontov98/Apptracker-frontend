@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 
 import { FiltersProvider } from "@/context/FiltersContext"
-import { DashboardLayout } from "@/layout/DashboardLayout"
+import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { ConversionPage } from "@/pages/ConversionPage"
 import { FunnelPage } from "@/pages/FunnelPage"
 import { OverviewPage } from "@/pages/OverviewPage"
