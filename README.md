@@ -1,8 +1,6 @@
 # AppTracker Frontend Dashboard
 
-A modern React dashboard for visualizing analytics data, built with TypeScript, Vite, and TailwindCSS.
-
-**🏗️ Standalone Repository** - This is an independent repository that can be deployed to cloud services.
+A modern React dashboard for visualizing analytics data from the AppTracker backend API, built with TypeScript, Vite, and TailwindCSS.
 
 ## Features
 
@@ -32,17 +30,13 @@ A modern React dashboard for visualizing analytics data, built with TypeScript, 
 npm install
 ```
 
-2. Set up environment variables:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and configure the backend URL:
+2. Create `.env.local` file in the root directory:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000
 ```
+
+Replace `http://localhost:5000` with your backend API URL.
 
 ## Running the Application
 
@@ -76,13 +70,12 @@ src/
 │   ├── common/
 │   │   └── ErrorBanner.tsx   # Reusable error display component
 │   ├── layout/
+│   │   ├── DashboardLayout.tsx # Main layout wrapper
 │   │   ├── Sidebar.tsx       # Navigation sidebar
 │   │   └── Topbar.tsx        # Top bar with filters
 │   └── ui/                   # shadcn/ui components
 ├── context/
 │   └── FiltersContext.tsx    # Global filter state management
-├── layout/
-│   └── DashboardLayout.tsx   # Main layout wrapper
 ├── pages/
 │   ├── OverviewPage.tsx      # Overview metrics dashboard
 │   ├── TopEventsPage.tsx     # Top events table
@@ -204,94 +197,11 @@ Vite provides instant HMR during development - changes are reflected immediately
 
 **Note:** All Vite environment variables must be prefixed with `VITE_` to be accessible in the application.
 
-**For Production/Cloud:** Set `VITE_API_BASE_URL` to your deployed backend URL (e.g., `https://apptracker-backend.herokuapp.com`)
+To configure the API URL, create a `.env.local` file in the root directory:
 
-## 🚀 Cloud Deployment
-
-### Deploy to Vercel
-
-1. **Install Vercel CLI:**
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Deploy:**
-   ```bash
-   vercel
-   ```
-
-3. **Set environment variable:**
-   - In Vercel dashboard, go to Settings → Environment Variables
-   - Add: `VITE_API_BASE_URL=https://your-backend-url.com`
-
-4. **Redeploy after setting environment variables**
-
-### Deploy to Netlify
-
-1. **Install Netlify CLI:**
-   ```bash
-   npm i -g netlify-cli
-   ```
-
-2. **Build locally first:**
-   ```bash
-   npm run build
-   ```
-
-3. **Deploy:**
-   ```bash
-   netlify deploy --prod
-   ```
-
-4. **Set environment variable:**
-   - In Netlify dashboard: Site settings → Environment variables
-   - Add: `VITE_API_BASE_URL=https://your-backend-url.com`
-
-5. **Redeploy**
-
-### Deploy to Render
-
-1. **Create a new Static Site on Render**
-
-2. **Connect your repository**
-
-3. **Configure:**
-   - **Build Command:** `npm install && npm run build`
-   - **Publish Directory:** `dist`
-
-4. **Set environment variable:**
-   - `VITE_API_BASE_URL=https://your-backend-url.com`
-
-### Deploy to GitHub Pages
-
-1. **Install gh-pages:**
-   ```bash
-   npm install --save-dev gh-pages
-   ```
-
-2. **Update package.json:**
-   ```json
-   {
-     "scripts": {
-       "predeploy": "npm run build",
-       "deploy": "gh-pages -d dist"
-     },
-     "homepage": "https://yourusername.github.io/apptracker-frontend"
-   }
-   ```
-
-3. **Build with production API URL:**
-   ```bash
-   VITE_API_BASE_URL=https://your-backend-url.com npm run build
-   npm run deploy
-   ```
-
-### Important Notes for Production
-
-- **Environment Variables:** Build-time variables (VITE_*) are baked into the build
-- **API URL:** Must be set at build time, not runtime
-- **CORS:** Ensure your backend allows requests from your frontend domain
-- **HTTPS:** Use HTTPS URLs in production for security
+```env
+VITE_API_BASE_URL=http://localhost:5000
+```
 
 ## Browser Support
 
