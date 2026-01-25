@@ -6,6 +6,8 @@ import { ErrorBanner } from "@/components/common/ErrorBanner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 // Fixed steps for MVP
 const FUNNEL_STEPS = ["app_open", "screen_view", "login_success", "purchase_success"]
@@ -34,6 +36,8 @@ export function FunnelPage() {
   const [data, setData] = useState<FunnelStep[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [mode, setMode] = useState<"USER" | "PROCESS">("USER")
+  const [processName, setProcessName] = useState<string>("checkout")
 
   // Load data when projectKey is selected, refreshToken changes, or manual trigger
   const loadFunnel = async () => {
@@ -43,17 +47,35 @@ export function FunnelPage() {
       return
     }
 
+    // Validate: if PROCESS mode, processName is required
+    if (mode === "PROCESS" && (!processName || !processName.trim())) {
+      setError("Process name is required when using Process Funnel mode")
+      setData([])
+      return
+    }
+
     setLoading(true)
     setError(null)
 
     try {
       // Build request body
-      const body: { projectKey: string; steps: string[]; from?: string; to?: string } = {
+      const body: { 
+        projectKey: string
+        steps: string[]
+        from?: string
+        to?: string
+        mode?: "USER" | "PROCESS"
+        processName?: string
+      } = {
         projectKey: filters.projectKey!,
         steps: FUNNEL_STEPS,
+        mode: mode,
       }
       if (filters.from && filters.from.trim()) body.from = filters.from
       if (filters.to && filters.to.trim()) body.to = filters.to
+      if (mode === "PROCESS" && processName && processName.trim()) {
+        body.processName = processName.trim()
+      }
 
       const response = await fetchFunnel(body)
 
@@ -83,10 +105,11 @@ export function FunnelPage() {
     }
   }
 
-  // Auto-load on projectKey or refreshToken change
+  // Auto-load on projectKey, mode, processName, or refreshToken change
   useEffect(() => {
     loadFunnel()
-  }, [filters.projectKey, filters.from, filters.to, filters.refreshToken])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.projectKey, filters.from, filters.to, filters.refreshToken, mode, processName])
 
   const hasProject = !!filters.projectKey
 
@@ -108,11 +131,55 @@ export function FunnelPage() {
         </Card>
       ) : (
         <>
+          {/* Funnel Mode Selection and Controls */}
+          <Card className="border-border/60 bg-card/40 shadow-sm mb-4">
+            <CardHeader>
+              <CardTitle className="text-base">Funnel Configuration</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Mode Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Funnel Mode</label>
+                <Select value={mode} onValueChange={(value) => setMode(value as "USER" | "PROCESS")}>
+                  <SelectTrigger className="w-full max-w-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USER">User Funnel</SelectItem>
+                    <SelectItem value="PROCESS">Process Funnel</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {mode === "USER" 
+                    ? "Track user progression through funnel steps"
+                    : "Track process/flow progression (supports multiple processes per user)"}
+                </p>
+              </div>
+
+              {/* Process Name Input (only shown for PROCESS mode) */}
+              {mode === "PROCESS" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Process Name</label>
+                  <Input
+                    type="text"
+                    placeholder="e.g., checkout, onboarding"
+                    value={processName}
+                    onChange={(e) => setProcessName(e.target.value)}
+                    className="max-w-xs"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    The name of the process/flow to track (e.g., "checkout", "onboarding")
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Run Funnel button */}
           <div className="mb-4">
             <Button
               onClick={loadFunnel}
-              disabled={loading}
+              disabled={loading || (mode === "PROCESS" && !processName?.trim())}
               className="bg-primary hover:bg-primary/90"
             >
               {loading ? "Running..." : "Run Funnel"}
@@ -144,7 +211,9 @@ export function FunnelPage() {
                   {/* Table header */}
                   <div className="grid grid-cols-12 gap-4 pb-2 border-b border-border/60">
                     <div className="col-span-4 text-sm font-medium text-muted-foreground">Step</div>
-                    <div className="col-span-2 text-sm font-medium text-muted-foreground text-right">Users</div>
+                    <div className="col-span-2 text-sm font-medium text-muted-foreground text-right">
+                      {mode === "PROCESS" ? "Processes" : "Users"}
+                    </div>
                     <div className="col-span-2 text-sm font-medium text-muted-foreground text-right">Drop-off</div>
                     <div className="col-span-4 text-sm font-medium text-muted-foreground">Visualization</div>
                   </div>

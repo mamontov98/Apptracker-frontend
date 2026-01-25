@@ -94,13 +94,23 @@ export async function fetchTimeSeries(params: {
 
 export type FunnelResponse = {
   projectKey: string
+  mode?: "USER" | "PROCESS"
+  processName?: string
+  totalProcesses?: number
   steps: Array<{
     eventName: string
     users: number
   }>
 }
 
-export async function fetchFunnel(data: { projectKey: string; steps: string[]; from?: string; to?: string }): Promise<FunnelResponse> {
+export async function fetchFunnel(data: { 
+  projectKey: string
+  steps: string[]
+  from?: string
+  to?: string
+  mode?: "USER" | "PROCESS"
+  processName?: string
+}): Promise<FunnelResponse> {
   const res = await apiClient.post<FunnelResponse>("/v1/reports/funnel", data)
   return res.data
 }
