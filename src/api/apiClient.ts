@@ -162,4 +162,20 @@ export async function fetchScreenViewsByHour(params: { projectKey: string; from?
   return res.data
 }
 
+export type EventNamesResponse = {
+  projectKey: string
+  eventNames: string[]
+  range: {
+    from: string | null
+    to: string | null
+  }
+}
+
+export async function fetchEventNames(params: { projectKey: string; from?: string; to?: string }): Promise<EventNamesResponse> {
+  const res = await apiClient.get<EventNamesResponse>(`/v1/projects/${params.projectKey}/events/names`, { 
+    params: { from: params.from, to: params.to } 
+  })
+  return res.data
+}
+
 
